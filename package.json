@@ -1,0 +1,19 @@
+{
+  "name": "bamazon-project",
+  "version": "1.0.0",
+  "description": "mysql + node.js ecomm store",
+  "main": "bamazaonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jliip51/bamazon/"
+  },
+  "author": "Jeff Liipfert",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^3.2.1",
+    "mysql": "^2.14.0"
+  }
+}
