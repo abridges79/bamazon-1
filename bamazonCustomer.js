@@ -9,6 +9,51 @@ var connection = mysql.createConnection({
   database: 'bamazon'
 });
 
+function continueShopping() {
+  inquirer.prompt([{
+    type: 'confirm',
+    message: '\nWould you like to place another order?\n',
+    name: 'continue'
+  }, ]).then(function(value) {
+    if (value.continue !== true) {
+      return connection.end();
+    }
+    return getProductList();
+  }).catch(function(error) {
+    throw error;
+  });
+};
+
+function completeOrder(item, amount) {
+  var netCost = parseInt(item.price) * parseInt(amount);
+  var totalCost = netCost + (netCost * 0.07);
+  var netStock = item.stock_quantity - amount;
+  inquirer.prompt([{
+    type: 'confirm',
+    message: '\nPlace order for ' + amount + ' of ' + item.product_name + ' at total price of $' + totalCost + ' (including 7% tax).\n',
+    name: 'placeOrder'
+  }, ]).then(function(value) {
+    if (value.placeOrder !== true) {
+      console.log('\nOrder cancelled.\n');
+      return continueShopping();
+    }
+    console.log('\nOrder confirmed. Your card will be charged $' + totalCost + '.\n');
+    var stockUpdate = [{
+        stock_quantity: netStock
+      },
+      {
+        item_id: item.item_id
+      }
+    ]
+    connection.query('UPDATE products SET ? WHERE ?', stockUpdate, function(error) {
+      if (error) throw error;
+    });
+    continueShopping();
+  }).catch(function(error) {
+    throw error;
+  });
+};
+
 function promptQuantity(item, question) {
   inquirer.prompt([{
     type: 'input',
@@ -20,15 +65,15 @@ function promptQuantity(item, question) {
           return true;
         }
         console.log('\nSorry. There is not enough ' + item.product_name + ' to fulfill your order.\n' +
-        'Change order to ' + item.stock_quantity + ' or less... or go back to making weak sauce cider.\n');
+          'Change order to ' + item.stock_quantity + ' or less... or go back to making weak sauce cider.\n');
         return false;
       }
       return false;
     },
   }, ]).then(function(response) {
-    console.log(item);
-    console.log(response.amount);
-    // completeOrder(item, response.amount);
+    completeOrder(item, response.amount);
+  }).catch(function(error) {
+    throw error;
   });
 };
 
@@ -68,6 +113,8 @@ function queryCustomer(data) {
       }
     }
     itemTypeMessage(selectedItem);
+  }).catch(function(error) {
+    throw error;
   });
 };
 
