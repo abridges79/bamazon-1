@@ -99,24 +99,52 @@ function addInventory() {
 };
 
 
-function completeAddInventory(item) {
+function addNewProduct() {
   inquirer.prompt([{
     type: 'input',
-    message: '\nSpecify amount of stock to add to ' + item.product_name + '.\n',
-    name: 'addStock',
+    message: '\nWhat is the name of the new product?\n',
+    name: 'name'
+  },
+  {
+    type: 'input',
+    message: '\nWhat is the department of the new product?\n',
+    name: 'department'
+  },
+  {
+    type: 'input',
+    message: '\nWhat is the price per unit of the new product?\n',
+    name: 'price',
     validate: function(value) {
       if (isNaN(value) === false) {
         return true;
       }
       return false;
-    },
-  }]).then(function(amount) {
-    var sqlQuery = 'SELECT * FROM products';
-    connection.query(sqlQuery, function(error, data) {
+    }
+  },
+  {
+    type: 'input',
+    message: '\nWhat is the starting stock quantity of the new product?\n',
+    name: 'stockQty',
+    validate: function(value) {
+      if (isNaN(value) === false) {
+        return true;
+      }
+      return false;
+    }
+  }]).then(function(response) {
+    var sqlQuery = 'INSERT INTO products SET ?';
+    var params = {
+      product_name: response.name,
+      department_name: response.department,
+      price: parseFloat(response.price),
+      stock_quantity: parseInt(response.stockQty)
+    }
+    connection.query(sqlQuery, params, function(error) {
       if (error) throw error;
-      selectAddInventory(data);
+      console.log('\nAdded new product ' + response.name + ' to database.\n');
+      connection.end();
   });
-};
+});
 };
 
 function promptAction() {
@@ -140,7 +168,7 @@ function promptAction() {
         break;
 
       case 'Add New Product':
-
+        addNewProduct();
         break;
     }
   }).catch(function(error) {
