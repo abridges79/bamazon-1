@@ -1,13 +1,14 @@
-CREATE DATABASE IF NOT EXISTS `bamazon`;
-USE `bamazon`;
+CREATE DATABASE IF NOT EXISTS bamazon;
+USE bamazon;
 
-DROP TABLE IF EXISTS `products`;
+DROP TABLE IF EXISTS products;
 
-CREATE TABLE `products` (
-  `item_id` int(11) NOT NULL AUTO_INCREMENT,
-  `product_name` varchar(50) NOT NULL,
-  `department_name` varchar(50) NOT NULL,
-  `price` int(11) DEFAULT 0,
-  `stock_quantity` int(11) DEFAULT 0,
-  PRIMARY KEY (`item_id`)
+CREATE TABLE products (
+  item_id INT(11) NOT NULL AUTO_INCREMENT,
+  product_name VARCHAR(50) NOT NULL,
+  department_name VARCHAR(50) NOT NULL,
+  price DECIMAL(10,2) DEFAULT 0,
+  stock_quantity INT(11) DEFAULT 0,
+  product_sales DECIMAL(10,2) DEFAULT 0,
+  PRIMARY KEY (item_id)
 );

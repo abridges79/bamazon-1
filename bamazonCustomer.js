@@ -1,13 +1,6 @@
 var mysql = require('mysql');
 var inquirer = require('inquirer');
-
-var connection = mysql.createConnection({
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  password: 'WIguIw2bv$$',
-  database: 'bamazon'
-});
+var connection = require('./connect.js');
 
 function continueShopping() {
   inquirer.prompt([{
@@ -25,9 +18,10 @@ function continueShopping() {
 };
 
 function completeOrder(item, amount) {
-  var netCost = parseInt(item.price) * parseInt(amount);
-  var totalCost = netCost + (netCost * 0.07);
+  var netCost = parseFloat(item.price) * parseInt(amount);
+  var totalCost = parseFloat(netCost + (netCost * 0.07)).toFixed(2);
   var netStock = item.stock_quantity - amount;
+  var totalSales = parseFloat(item.product_sales + netCost).toFixed(2);
   inquirer.prompt([{
     type: 'confirm',
     message: '\nPlace order for ' + amount + ' of ' + item.product_name + ' at total price of $' + totalCost + ' (including 7% tax).\n',
@@ -39,13 +33,19 @@ function completeOrder(item, amount) {
     }
     console.log('\nOrder confirmed. Your card will be charged $' + totalCost + '.\n');
     var stockUpdate = [{
-        stock_quantity: netStock
-      },
-      {
-        item_id: item.item_id
-      }
-    ]
+      stock_quantity: netStock
+    }, {
+      item_id: item.item_id
+    }];
+    var salesUpdate = [{
+      product_sales: totalSales
+    }, {
+      item_id: item.item_id
+    }];
     connection.query('UPDATE products SET ? WHERE ?', stockUpdate, function(error) {
+      if (error) throw error;
+    });
+    connection.query('UPDATE products SET ? WHERE ?', salesUpdate, function(error) {
       if (error) throw error;
     });
     continueShopping();
