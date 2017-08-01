@@ -12,4 +12,4 @@ In the Bamazon [manager module](/bamazonManager.js/), you select from a list of 
 
 ### Customer Module - run node bamazonManager.js in CL
 **Select product to order.**
-[Product List Screen Grab](/images/bmzCust1.png/)
+![Product List Screen Grab](/images/bmzCust1.png/)
